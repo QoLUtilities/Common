@@ -1,0 +1,8 @@
+## Interface: 90100
+## Title: QoL-Common
+## Author: redbeard923
+## Version: 1.0.0
+
+Constants.lua
+Common.lua
+Options.lua
