@@ -10,14 +10,14 @@ end
 function common.Log(message, subID)
 	local ID = '[QoLUtils]'
 	if not common.IsNilOrWhitespace(subID) then
-		ID = format('[QoL Utils - %s]', subID)
+		ID = format('[QoLUtils - %s]', subID)
 	end
 	message = common.ValueOrDefault(message)
 	print(format('%s  %s  %s', date('%H:%M'), ID, message))
 end
 
 function common.IsNilOrWhitespace(val)
-	return val == nil or val:gsub('^%s+', '') == ''
+	return val == nil or val:gsub(common.Patterns.WhiteSpaceStart, '') == ''
 end
 
 function common.ValueOrDefault(val, default)
@@ -49,8 +49,12 @@ end
 function common.TableToStr(t, separator)
 	local str = ''
 	local sep = common.ValueOrDefault(separator, ' ')
-	for i = 1, table.getn(t) do
-		str = str .. tostring(t[i]) .. sep
+	local count = table.getn(t)
+	for i = 1, count do
+		str = str .. tostring(t[i]) 
+		if i < count then
+			str = str .. sep
+		end
 	end
 	str = str:gsub(common.Patterns.WhiteSpaceStart, ''):gsub(common.WhiteSpaceEnd, '')
 	return str
@@ -70,27 +74,27 @@ function common.GetFrame(name)
 	end
 end
 
-function common.SettingIsTrue(toonActive, acctSetting, toonSetting)
+function common.SettingEnabled(acctSetting, toonSetting, toonActive)
 	return toonActive and toonSetting or not toonActive and acctSetting
 end
 
-function common.ToggleSetting(state, acctSetting, toonSetting, acctCheckBox, toonCheckBox)
+function common.ToggleSetting(state, acctSetting, toonSetting, acctCheckBox, toonCheckBox, toonActive)
 	local modifiedToonSetting = toonSetting
 	local modifiedAcctSetting = acctSetting
-	if QOL_Config_Toon.Active then
+	if toonActive then
 		if state == nil then
 			modifiedToonSetting = not toonSetting
 		else
 			modifiedToonSetting = state
 		end
-		common.OPT.UpdateCheckBox(toonCheckBox, modifiedToonSetting)
+		common.UpdateCheckBox(toonCheckBox, modifiedToonSetting)
 	else
 		if state == nil then
 			modifiedAcctSetting = not acctSetting
 		else
 			modifiedAcctSetting = state
 		end
-		common.OPT.UpdateCheckBox(acctCheckBox, modifiedAcctSetting)
+		common.UpdateCheckBox(acctCheckBox, modifiedAcctSetting)
 	end
 	return modifiedAcctSetting, modifiedToonSetting
 end

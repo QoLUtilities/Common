@@ -5,63 +5,36 @@ end
 local common = QOLUtilsCommon
 
 CMN.Panel = nil
-CMN.LastChild = nil
-CMN.LastChildCount = 0
+CMN.ChildCount = 0
 
-SLASH_QOLUTILITIESCOMMON1 = '/qol'
+SLASH_QOLUTILITIESCOMMON1 = '/qolcmn'
 SlashCmdList['QOLUTILITIESCOMMON'] = QOLUtilsCommon.OpenConfig
-
-function CMN.LoadDefaults()
-	if CMN_Config_Toon == nil then 
-		CMN_Config_Toon = {}
-	end
-	if CMN_Config_Toon.Active == nil then
-		CMN_Config_Toon.Active = false
-	end
-end
 
 function common.OpenConfig(child)
 	if CMN.Panel then
 		InterfaceOptionsFrame_Show()
-		InterfaceOptionsFrame_OpenToCategory(child == nil and CMN.Panel or child)
+		InterfaceOptionsFrame_OpenToCategory(child or CMN.Panel)
 	end
 end
 
 function common.CreateConfigPanel()
 	if not CMN.Panel then
-		CMN.Panel = CreateFrame('Frame', 'QOL_Utils_Frame_' .. CMN.GetUniqueID(), UIParent)
+		CMN.Panel = CreateFrame('Frame', 'QOLUtils_Frame_' .. CMN.GetUniqueID(), UIParent)
 		CMN.Panel.name = 'QoL Utilities'
-		CMN.CheckBoxActive = common.CreateCheckBox(CMN.Panel, -CMN.Panel, common.ConfigSpacing.Indent, -common.ConfigSpacing.SectionGap, common.Labels.UseToon, CMN_Config_Toon.Active, common.ToggleToonSpecific)
 		InterfaceOptions_AddCategory(CMN.Panel);
 	end
 end
 
 function common.CreateChildConfigPanel(name, headerText)
 	common.CreateConfigPanel()
-	local child = CreateFrame('Frame', 'QOL_Utils_Frame_' .. CMN.GetUniqueID(), CMN.Panel)
+	local child = CreateFrame('Frame', 'QOLUtils_Frame_' .. CMN.GetUniqueID(), CMN.Panel)
 	child.name = name
 	child.parent = CMN.Panel.name
 	InterfaceOptions_AddCategory(child)
-	CMN.LastChild = CMN.CreateLinkHeader(CMN.Panel, CMN.LastChild, common.ConfigSpacing.Indent, -common.ConfigSpacing.HeaderGap, headerText, child)
+	CMN.ChildCount = CMN.ChildCount + 1
+	local finalText = headerText or 'Go to ' .. name .. ' settings.'
+	local linkLabel = CMN.CreateLinkLabel(CMN.Panel, CMN.Panel, common.ConfigSpacing.Indent, -common.ConfigSpacing.SectionGap * CMN.ChildCount, finalText, child)
 	return child
-end
-
-function common.CreateHeader(parent, relativeParent, x, y, text)
-	local fontFrame = CreateFrame('Frame', 'QOL_Utils_FontFrame_' .. CMN.GetUniqueID(), parent)
-	fontFrame:SetPoint('TOPLEFT', relativeParent, 'TOPLEFT', x, y)
-	fontFrame:SetSize(500, 10)
-	local fontString = fontFrame:CreateFontString('QOLUtils_FontString_' .. CMN.GetUniqueID(), 'BACKGROUND', 'GameFontWhite')
-	fontString:SetPoint('TOPLEFT')
-	fontString:SetText(text)
-	fontFrame.text = fontString
-	return fontFrame
-end
-
-function CMN.CreateLinkHeader(parent, relativeParent, x, y, text, linkPanel)
-	local header = common.CreateHeader(parent, relativeParent, x, y, text)
-	header:SetScript('OnClick', function()
-		common.OpenConfig(linkPanel)
-	end)
 end
 
 function common.CreateCheckBox(parent, relativeParent, x, y, text, checked, callback)
@@ -74,7 +47,7 @@ function common.CreateCheckBox(parent, relativeParent, x, y, text, checked, call
 end
 
 function common.CreateLabel(parent, relativeParent, x, y, text)
-	local fontFrame = CreateFrame('Frame', 'QOLUtils_FontFrame_' .. CMN.GetUniqueID(), parent)
+	local fontFrame = CreateFrame('Frame', 'QOLUtils_Label_' .. CMN.GetUniqueID(), parent)
 	fontFrame:SetPoint('TOPLEFT', relativeParent, 'TOPLEFT', x, y)
 	fontFrame:SetSize(500, 30)
 	local fontString = fontFrame:CreateFontString('QOLUtils_FontString_' .. CMN.GetUniqueID(), 'BACKGROUND', 'GameFontWhite')
@@ -82,6 +55,16 @@ function common.CreateLabel(parent, relativeParent, x, y, text)
 	fontString:SetText(text)
 	fontFrame.text = fontString
 	return fontFrame
+end
+
+function CMN.CreateLinkLabel(parent, relativeParent, x, y, text, linkPanel)
+	local label = common.CreateLabel(parent, relativeParent, x, y, text)
+	local highlight = label:CreateTexture(nil, 'HIGHLIGHT')
+	highlight:SetAllPoints(true)
+	highlight:SetTexture(1, 1, 1, 0.1)
+	label:SetScript('OnClick', function()
+		common.OpenConfig(linkPanel)
+	end)
 end
 
 function common.CreateEditBox(parent, relativeParent, x, y, text, callback)
@@ -96,15 +79,10 @@ function common.CreateEditBox(parent, relativeParent, x, y, text, callback)
 	return editBox
 end
 
-local uniqueID = 0
+CMN.UniqueID = 0
 function CMN.GetUniqueID()
-	uniqueID = uniqueID + 1
-	return uniqueID
-end
-
-function common.ToggleToonSpecific()
-	CMN_Config_Toon.Active = not CMN_Config_Toon.Active
-	common.UpdateCheckBox(CMN.CheckBoxActive, CMN_Config_Toon.Active)
+	CMN.UniqueID = CMN.UniqueID + 1
+	return CMN.UniqueID
 end
 
 function common.UpdateCheckBox(checkBox, checked)
