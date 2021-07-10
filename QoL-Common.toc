@@ -2,6 +2,7 @@
 ## Title: QoL-Common
 ## Author: redbeard923
 ## Version: 1.0.0
+## SavedVariablesPerCharacter: CMN_Config_Toon
 
 Constants.lua
 Common.lua

@@ -1,4 +1,4 @@
-if QOLUtilsCommon == nil then
+if not QOLUtilsCommon then
 	QOLUtilsCommon = {}
 end
 local common = QOLUtilsCommon
