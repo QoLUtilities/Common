@@ -1,27 +1,28 @@
 if QOLUtilsCommon == nil then
 	QOLUtilsCommon = {}
 end
+local common = QOLUtilsCommon
 
-function QOLUtilsCommon.ParseInput(msg)
-	return QOLUtilsCommon.StrToTable(msg, QOLUtilsCommon.Patterns.Words)
+function common.ParseInput(msg)
+	return common.StrToTable(msg, common.Patterns.Words)
 end
 
-function QOLUtilsCommon.Log(message, subID)
+function common.Log(message, subID)
 	local ID = '[QoLUtils]'
-	if not QOLUtilsCommon.IsNilOrWhitespace(subID) then
+	if not common.IsNilOrWhitespace(subID) then
 		ID = format('[QoL Utils - %s]', subID)
 	end
-	message = QOLUtilsCommon.ValueOrDefault(message)
+	message = common.ValueOrDefault(message)
 	print(format('%s  %s  %s', date('%H:%M'), ID, message))
 end
 
-function QOLUtilsCommon.IsNilOrWhitespace(val)
+function common.IsNilOrWhitespace(val)
 	return val == nil or val:gsub('^%s+', '') == ''
 end
 
-function QOLUtilsCommon.ValueOrDefault(val, default)
+function common.ValueOrDefault(val, default)
 	local result = nil
-	if QOLUtilsCommon.IsNilOrWhitespace(val) then
+	if common.IsNilOrWhitespace(val) then
 		if default == nil then
 			result = 'NIL'
 		else
@@ -33,11 +34,11 @@ function QOLUtilsCommon.ValueOrDefault(val, default)
 	return result
 end
 
-function QOLUtilsCommon.TableIsNilOrEmpty(t)
+function common.TableIsNilOrEmpty(t)
 	return t == nil or table.getn(t) < 1
 end
 
-function QOLUtilsCommon.StrToTable(str, pattern)
+function common.StrToTable(str, pattern)
 	local args = {}
 	for num in str:gmatch(pattern) do
 		table.insert(args, num)
@@ -45,17 +46,17 @@ function QOLUtilsCommon.StrToTable(str, pattern)
 	return args
 end
 
-function QOLUtilsCommon.TableToStr(t, separator)
+function common.TableToStr(t, separator)
 	local str = ''
-	local sep = QOLUtilsCommon.ValueOrDefault(separator, ' ')
+	local sep = common.ValueOrDefault(separator, ' ')
 	for i = 1, table.getn(t) do
 		str = str .. tostring(t[i]) .. sep
 	end
-	str = str:gsub('^%s+', ''):gsub('%s+$', '')
+	str = str:gsub(common.Patterns.WhiteSpaceStart, ''):gsub(common.WhiteSpaceEnd, '')
 	return str
 end
 
-function QOLUtilsCommon.GetFrame(name)
+function common.GetFrame(name)
 	local frame = _G[name]
 	if frame == nil then 
 		for i = 1, 10 do
@@ -69,11 +70,11 @@ function QOLUtilsCommon.GetFrame(name)
 	end
 end
 
-function QOLUtilsCommon.SettingIsTrue(acctSetting, toonSetting)
-	return QOL_Config_Toon.Active and toonSetting or not QOL_Config_Toon.Active and acctSetting
+function common.SettingIsTrue(toonActive, acctSetting, toonSetting)
+	return toonActive and toonSetting or not toonActive and acctSetting
 end
 
-function QOLUtilsCommon.ToggleSetting(state, acctSetting, toonSetting, acctCheckBox, toonCheckBox)
+function common.ToggleSetting(state, acctSetting, toonSetting, acctCheckBox, toonCheckBox)
 	local modifiedToonSetting = toonSetting
 	local modifiedAcctSetting = acctSetting
 	if QOL_Config_Toon.Active then
@@ -82,14 +83,14 @@ function QOLUtilsCommon.ToggleSetting(state, acctSetting, toonSetting, acctCheck
 		else
 			modifiedToonSetting = state
 		end
-		QOLUtilsCommon.OPT.UpdateCheckBox(toonCheckBox, modifiedToonSetting)
+		common.OPT.UpdateCheckBox(toonCheckBox, modifiedToonSetting)
 	else
 		if state == nil then
 			modifiedAcctSetting = not acctSetting
 		else
 			modifiedAcctSetting = state
 		end
-		QOLUtilsCommon.OPT.UpdateCheckBox(acctCheckBox, modifiedAcctSetting)
+		common.OPT.UpdateCheckBox(acctCheckBox, modifiedAcctSetting)
 	end
 	return modifiedAcctSetting, modifiedToonSetting
 end
