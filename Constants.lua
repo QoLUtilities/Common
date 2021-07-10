@@ -44,8 +44,3 @@ smn.Header = 'Summon Mounts & Pets'
 smn.Report = 'Report Summon status at player logon and on reload.'
 smn.OnlyFavoritePets = 'Only summon favorite pets when summoning a random pet.'
 smn.OnlyFavoriteMounts = 'Only summon favorite mounts when summoning a mount.'
-
-QOLUtilsCommon.Labels.VC = {}
-local vc = QOLUtilsCommon.Labels.VC
-vc.Header = 'Volume Cycler'
-vc.Levels = 'Volume percentages to cycle through (each value separated by whitespace).'
